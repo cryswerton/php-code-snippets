@@ -1,0 +1,15 @@
+# Local snippet store
+private/snippets.json
+
+# macOS
+.DS_Store
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
