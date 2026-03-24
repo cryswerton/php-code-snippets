@@ -1,4 +1,4 @@
-# Local snippet store
+# Local snippet data (directory kept via private/.gitkeep)
 private/snippets.json
 
 # macOS
