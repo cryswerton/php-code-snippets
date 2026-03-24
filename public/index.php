@@ -313,7 +313,19 @@ $pageTitle = 'PHP Snippets';
             margin-bottom: 0.35rem;
             color: var(--muted);
         }
-        input[type="text"], textarea {
+        .list-toolbar {
+            padding: 1rem 1.25rem 0;
+        }
+        .list-toolbar label {
+            margin-bottom: 0.35rem;
+        }
+        .search-empty {
+            margin: 0;
+            padding: 0 1.25rem 1rem;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        input[type="text"], input[type="search"], textarea {
             width: 100%;
             padding: 0.65rem 0.85rem;
             border-radius: 8px;
@@ -367,6 +379,11 @@ $pageTitle = 'PHP Snippets';
                     <a class="btn btn-primary" href="?action=new">Add snippet</a>
                 </div>
             <?php else: ?>
+                <div class="list-toolbar">
+                    <label for="snippet-search">Search titles</label>
+                    <input type="search" id="snippet-search" autocomplete="off" placeholder="Search titles…" aria-controls="snippet-table-body">
+                </div>
+                <p class="search-empty" id="snippet-search-empty" hidden>No snippets match your search.</p>
                 <table>
                     <thead>
                         <tr>
@@ -375,7 +392,7 @@ $pageTitle = 'PHP Snippets';
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="snippet-table-body">
                         <?php foreach ($snippets as $s): ?>
                             <tr>
                                 <td>
@@ -472,6 +489,47 @@ $pageTitle = 'PHP Snippets';
     if (window.Prism) {
         Prism.highlightAll();
     }
+</script>
+<script>
+(function () {
+    var input = document.getElementById('snippet-search');
+    var tbody = document.getElementById('snippet-table-body');
+    var emptyMsg = document.getElementById('snippet-search-empty');
+    if (!input || !tbody) {
+        return;
+    }
+    var debounceMs = 1000;
+    var timer = null;
+
+    function applyFilter() {
+        var q = input.value.trim().toLowerCase();
+        var rows = tbody.querySelectorAll('tr');
+        var visible = 0;
+        for (var i = 0; i < rows.length; i++) {
+            var tr = rows[i];
+            var titleEl = tr.querySelector('.snippet-title');
+            var title = titleEl ? titleEl.textContent : '';
+            var matches = q === '' || title.toLowerCase().indexOf(q) !== -1;
+            tr.hidden = !matches;
+            if (matches) {
+                visible++;
+            }
+        }
+        if (emptyMsg) {
+            emptyMsg.hidden = !(q !== '' && visible === 0);
+        }
+    }
+
+    input.addEventListener('input', function () {
+        if (timer !== null) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(function () {
+            timer = null;
+            applyFilter();
+        }, debounceMs);
+    });
+})();
 </script>
 </body>
 </html>
